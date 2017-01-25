@@ -47,4 +47,3 @@ function extractFunctionNames(fileContent) {
 
 exports.modularize = modularize;
 exports.include = include;
-exports.dependencies = dependencies;
