@@ -1,3 +1,4 @@
+const COMPIL_TARGET_DIR = './target';
 var fs = require('fs');
 
 var dependencies = [];
@@ -9,18 +10,33 @@ function include(name, dependency, callback) {
 
 function modularize(fileName) {
 
-    var rootDir = __dirname + '/';
-    fileName += fileName.endsWith('.js') ? '' : '.js';
-    var sourceFile = fs.readFileSync(rootDir + fileName);
-    var fileContent = sourceFile.toString();
-    var functionNames = extractFunctionNames(fileContent);
-    fileContent = declareDependencies() + fileContent;
+    var src = parse(fileName);
+
+    var fileContent = declareDependencies() + src.fileContent;
     eval(fileContent);
 
-    for (var index in functionNames) {
-        exports[functionNames[index]] = eval(functionNames[index]);
+    for (var index in src.functionNames) {
+        var functionName = src.functionNames[index];
+        exports[functionName] = eval(functionName);
     }
     return this;
+}
+
+function compile(fileName) {
+    var src = parse(fileName);
+    var functionNames = src.functionNames;
+    var compiledFileContents = src.fileContent;
+
+    for (var index in functionNames) {
+        var functionName = functionNames[index];
+        compiledFileContents += '\nexports.' + functionName + ' = ' + functionName + ';'
+    }
+    if (!fs.existsSync(COMPIL_TARGET_DIR)) {
+        fs.mkdirSync(COMPIL_TARGET_DIR);
+    }
+    var compiledFilePath = COMPIL_TARGET_DIR + '/' + src.fileName;
+    fs.writeFile(compiledFilePath, compiledFileContents);
+    return require(compiledFilePath);
 }
 
 function declareDependencies() {
@@ -45,5 +61,15 @@ function extractFunctionNames(fileContent) {
     return functionNames;
 }
 
+function parse(fileName) {
+    var rootDir = __dirname + '/../../';
+    fileName += fileName.endsWith('.js') ? '' : '.js';
+    var sourceFile = fs.readFileSync(rootDir + fileName);
+    var fileContent = sourceFile.toString();
+    var functionNames = extractFunctionNames(fileContent);
+    return {fileName: fileName, fileContent: fileContent, functionNames: functionNames};
+}
+
 exports.modularize = modularize;
 exports.include = include;
+exports.compile = compile;
