@@ -2,11 +2,13 @@ var chai = require('chai');
 var sinon = require('sinon');
 var nodeit = require('../nodeit');
 var fs = require('fs');
-
+const TARGET = nodeitDirname() + '/target';;
 fs.mkdirSync = function () {
 
 };
+fs.writeFileSync = function () {
 
+};
 
 describe('nodeit', function () {
     beforeEach(function () {
@@ -75,10 +77,9 @@ describe('nodeit', function () {
         beforeEach(function () {
             doesDirExist = sinon.stub(fs, 'existsSync');
             createDirectory = sinon.spy(fs, 'mkdirSync');
-            createCompiledFile = sinon.spy(fs, 'writeFile');
+            createCompiledFile = sinon.spy(fs, 'writeFileSync');
             readSourceFile = sinon.stub(fs, 'readFileSync');
             readSourceFile.returns('');
-
         });
 
         it('should be defined', function () {
@@ -86,21 +87,21 @@ describe('nodeit', function () {
         });
         it('should create target directory when it does not exist', function () {
             // Given
-            doesDirExist.withArgs('./target').returns(false);
+            doesDirExist.withArgs(TARGET).returns(false);
 
             // When
-            nodeit.compile('');
+            nodeit.compile('vanilla');
 
             // Then
-            sinon.assert.calledWith(createDirectory, './target');
+            sinon.assert.calledWith(createDirectory, TARGET);
 
         });
         it('should not create target directory when it exists', function () {
             // Given
-            doesDirExist.withArgs('./target').returns(true);
+            doesDirExist.withArgs(TARGET).returns(true);
 
             // When
-            nodeit.compile('');
+            nodeit.compile('vanilla');
 
             // Then
             createDirectory.callCount.should.equal(0);
@@ -123,7 +124,7 @@ describe('nodeit', function () {
             nodeit.compile('vanilla');
 
             // Then
-            var compiledContents = "" +
+            var compiledContent = "" +
                 "function desired_function_to_wrap() {" +
                 "   return  'first wrap';" +
                 "}" +
@@ -132,7 +133,7 @@ describe('nodeit', function () {
                 "}\n" +
                 "exports.desired_function_to_wrap = desired_function_to_wrap;\n" +
                 "exports.another_desired_function_to_wrap = another_desired_function_to_wrap;";
-            createCompiledFile.withArgs('./target/vanilla.js', compiledContents).calledOnce.should.equal(true);
+            createCompiledFile.withArgs(TARGET + '/vanilla.js', compiledContent).calledOnce.should.equal(true);
             fs.readFileSync.restore();
         });
 
@@ -141,7 +142,9 @@ describe('nodeit', function () {
             createDirectory.restore();
             doesDirExist.restore();
             createCompiledFile.restore();
-
         });
     });
 });
+function nodeitDirname() {
+    return __dirname.substring(0, __dirname.lastIndexOf('/'));
+}

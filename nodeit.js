@@ -1,4 +1,4 @@
-const COMPIL_TARGET_DIR = './target';
+const COMPIL_TARGET_DIR = __dirname + '/target';
 var fs = require('fs');
 
 var dependencies = [];
@@ -12,8 +12,7 @@ function modularize(fileName) {
 
     var src = parse(fileName);
 
-    var fileContent = declareDependencies() + src.fileContent;
-    eval(fileContent);
+    eval(src.fileContent);
 
     for (var index in src.functionNames) {
         var functionName = src.functionNames[index];
@@ -25,17 +24,17 @@ function modularize(fileName) {
 function compile(fileName) {
     var src = parse(fileName);
     var functionNames = src.functionNames;
-    var compiledFileContents = src.fileContent;
+    var compiledFileContent = src.fileContent;
 
     for (var index in functionNames) {
         var functionName = functionNames[index];
-        compiledFileContents += '\nexports.' + functionName + ' = ' + functionName + ';'
+        compiledFileContent += '\nexports.' + functionName + ' = ' + functionName + ';'
     }
     if (!fs.existsSync(COMPIL_TARGET_DIR)) {
         fs.mkdirSync(COMPIL_TARGET_DIR);
     }
-    var compiledFilePath = COMPIL_TARGET_DIR + '/' + src.fileName;
-    fs.writeFile(compiledFilePath, compiledFileContents);
+    var compiledFilePath = COMPIL_TARGET_DIR + '/' + removeDirFromPath(src);
+    fs.writeFileSync(compiledFilePath, compiledFileContent);
     return require(compiledFilePath);
 }
 
@@ -65,9 +64,13 @@ function parse(fileName) {
     var rootDir = __dirname + '/../../';
     fileName += fileName.endsWith('.js') ? '' : '.js';
     var sourceFile = fs.readFileSync(rootDir + fileName);
-    var fileContent = sourceFile.toString();
+    var fileContent = declareDependencies() + sourceFile.toString();
     var functionNames = extractFunctionNames(fileContent);
     return {fileName: fileName, fileContent: fileContent, functionNames: functionNames};
+}
+
+function removeDirFromPath(src) {
+    return src.fileName.substring(src.fileName.lastIndexOf('/') + 1);
 }
 
 exports.modularize = modularize;
