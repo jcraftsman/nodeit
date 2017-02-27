@@ -137,6 +137,37 @@ describe('nodeit', function () {
             fs.readFileSync.restore();
         });
 
+        describe('dependsOnStatic', function () {
+            it('should define given methods on the class given by its name', function () {
+                // Given
+                var wrappedModule = nodeit.modularize('fileName');
+
+                //When
+                wrappedModule.dependsOnStatic('Class', 'staticMethod');
+
+                //Then
+                Class.staticMethod.should.be.defined;
+
+            });
+
+            it('should append the class given by its name with staticMethods', function () {
+                // Given
+                var wrappedModule = nodeit.modularize('fileName');
+                global.Class={existingStaticMethod:function () {
+
+                }};
+
+                //When
+                wrappedModule.dependsOnStatic('Class', 'anotherStaticMethod');
+
+                //Then
+                Class.existingStaticMethod.should.be.defined;
+                Class.anotherStaticMethod.should.be.defined;
+
+            });
+
+        });
+
         afterEach(function () {
             readSourceFile.restore();
             createDirectory.restore();

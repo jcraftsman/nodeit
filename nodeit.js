@@ -38,6 +38,13 @@ function compile(fileName) {
     return require(compiledFilePath);
 }
 
+function dependsOnStatic(className, staticMethodName) {
+    if (!global[className]) {
+        global[className] = {};
+    }
+    var theClass = global[className];
+    appendClassWithMethod(theClass, staticMethodName);
+}
 function declareDependencies() {
     var declareDependencies = '';
     for (var depIndex in dependencies) {
@@ -73,6 +80,13 @@ function removeDirFromPath(src) {
     return src.fileName.substring(src.fileName.lastIndexOf('/') + 1);
 }
 
+function appendClassWithMethod(classObject, staticMethodName) {
+    classObject[staticMethodName] = function () {
+        throw 'Not implemented. Declared for static dependency stubbing only!'
+    };
+}
+
 exports.modularize = modularize;
 exports.include = include;
 exports.compile = compile;
+exports.dependsOnStatic = dependsOnStatic;
