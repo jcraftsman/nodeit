@@ -1,6 +1,6 @@
 {
   "name": "nodeit",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "It wraps functions from js files and export them as a node module.",
   "main": "nodeit.js",
   "scripts": {

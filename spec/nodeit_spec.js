@@ -166,6 +166,19 @@ describe('nodeit', function () {
 
             });
 
+            it('should append the class given by its name with staticMethods given by their names in an array', function () {
+                // Given
+                var wrappedModule = nodeit.modularize('fileName');
+
+                //When
+                wrappedModule.dependsOnStatic('Class', ['firstStaticMethod','secondStaticMethod']);
+
+                //Then
+                Class.firstStaticMethod.should.be.defined;
+                Class.secondStaticMethod.should.be.defined;
+
+            });
+
         });
 
         afterEach(function () {

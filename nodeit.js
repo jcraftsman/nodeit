@@ -43,8 +43,13 @@ function dependsOnStatic(className, staticMethodName) {
         global[className] = {};
     }
     var theClass = global[className];
-    appendClassWithMethod(theClass, staticMethodName);
+    var allStaticMethodNames = staticMethodName.constructor === Array ? staticMethodName : [staticMethodName];
+
+    for (var i in allStaticMethodNames) {
+        appendClassWithMethod(theClass, allStaticMethodNames[i]);
+    }
 }
+
 function declareDependencies() {
     var declareDependencies = '';
     for (var depIndex in dependencies) {
