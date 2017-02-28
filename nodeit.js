@@ -48,6 +48,7 @@ function dependsOnStatic(className, staticMethodName) {
     for (var i in allStaticMethodNames) {
         appendClassWithMethod(theClass, allStaticMethodNames[i]);
     }
+    return this;
 }
 
 function declareDependencies() {
