@@ -45,9 +45,10 @@ function dependsOnStatic(className, staticMethodName) {
     var theClass = global[className];
     var allStaticMethodNames = staticMethodName.constructor === Array ? staticMethodName : [staticMethodName];
 
-    for (var i in allStaticMethodNames) {
-        appendClassWithMethod(theClass, allStaticMethodNames[i]);
-    }
+    allStaticMethodNames.forEach(function (methodName) {
+        appendClassWithMethod(theClass, methodName);
+
+    });
     return this;
 }
 
@@ -88,7 +89,7 @@ function removeDirFromPath(src) {
 
 function appendClassWithMethod(classObject, staticMethodName) {
     classObject[staticMethodName] = function () {
-        throw 'Not implemented. Declared for static dependency stubbing only!'
+        throw staticMethodName + ' is not implemented. It is declared for static dependency stubbing only!'
     };
 }
 

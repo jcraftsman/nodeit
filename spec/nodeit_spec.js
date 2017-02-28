@@ -2,7 +2,7 @@ var chai = require('chai');
 var sinon = require('sinon');
 var nodeit = require('../nodeit');
 var fs = require('fs');
-const TARGET = nodeitDirname() + '/target';;
+const TARGET = nodeitDirname() + '/target';
 fs.mkdirSync = function () {
 
 };
@@ -133,7 +133,7 @@ describe('nodeit', function () {
                 "}\n" +
                 "exports.desired_function_to_wrap = desired_function_to_wrap;\n" +
                 "exports.another_desired_function_to_wrap = another_desired_function_to_wrap;";
-            createCompiledFile.withArgs(TARGET + '/vanilla.js', compiledContent).calledOnce.should.equal(true);
+            createCompiledFile.withArgs(sinon.match(TARGET + '/vanilla.js', compiledContent)).calledOnce.should.equal(true);
             fs.readFileSync.restore();
         });
 
@@ -153,9 +153,11 @@ describe('nodeit', function () {
             it('should append the class given by its name with staticMethods', function () {
                 // Given
                 var wrappedModule = nodeit.modularize('fileName');
-                global.Class={existingStaticMethod:function () {
+                global.Class = {
+                    existingStaticMethod: function () {
 
-                }};
+                    }
+                };
 
                 //When
                 wrappedModule.dependsOnStatic('Class', 'anotherStaticMethod');
@@ -171,7 +173,7 @@ describe('nodeit', function () {
                 var wrappedModule = nodeit.modularize('fileName');
 
                 //When
-                wrappedModule.dependsOnStatic('Class', ['firstStaticMethod','secondStaticMethod']);
+                wrappedModule.dependsOnStatic('Class', ['firstStaticMethod', 'secondStaticMethod']);
 
                 //Then
                 Class.firstStaticMethod.should.be.defined;
