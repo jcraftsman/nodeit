@@ -22,9 +22,14 @@ function modularize(fileName) {
 }
 
 function compile(fileName) {
-    var src = parse(fileName);
+    var source_path = getSourceUrl(fileName);
+    var src = parse(source_path);
     var functionNames = src.functionNames;
-    var compiledFileContent = src.fileContent;
+    var compiledFileContent = "var fs = require('fs');\n"
+    compiledFileContent += "var vm = require('vm');\n"
+    compiledFileContent += "var data = fs.readFileSync(\'" + source_path + "\');\n"
+    compiledFileContent += "context = {}\n"
+    compiledFileContent += "vm.runInNewContext(data, context, '" + source_path + "')\n";;
 
     for (var index in functionNames) {
         var functionName = functionNames[index];
@@ -75,12 +80,16 @@ function extractFunctionNames(fileContent) {
 }
 
 function parse(fileName) {
-    var rootDir = __dirname + '/../../';
-    fileName += fileName.endsWith('.js') ? '' : '.js';
-    var sourceFile = fs.readFileSync(rootDir + fileName);
+    var sourceFile = fs.readFileSync(fileName);
     var fileContent = declareDependencies() + sourceFile.toString();
     var functionNames = extractFunctionNames(fileContent);
     return {fileName: fileName, fileContent: fileContent, functionNames: functionNames};
+}
+
+function getSourceUrl(fileName) {
+    var rootDir = __dirname + '/../../';
+    fileName += fileName.endsWith('.js') ? '' : '.js';
+    return fs.realpathSync(rootDir + fileName)
 }
 
 function removeDirFromPath(src) {

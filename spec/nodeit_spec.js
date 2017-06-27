@@ -13,11 +13,14 @@ fs.writeFileSync = function () {
 describe('nodeit', function () {
     beforeEach(function () {
         chai.should();
+        sinon.stub(fs, 'realpathSync').returns('vanilla.js');
     });
+
     describe('modularize', function () {
         it('should export the function from a vanilla js file ', function () {
             // Given
             sinon.stub(fs, 'readFileSync').returns('function desired_function_to_wrap(){}');
+
 
             // When
             var wrappedModule = nodeit.modularize('fileName');
@@ -73,7 +76,7 @@ describe('nodeit', function () {
 
     describe('compile', function () {
 
-        var doesDirExist, createDirectory, createCompiledFile, readSourceFile;
+        var doesDirExist, createDirectory, createCompiledFile, readSourceFile, realpathSyncFile;
         beforeEach(function () {
             doesDirExist = sinon.stub(fs, 'existsSync');
             createDirectory = sinon.spy(fs, 'mkdirSync');
@@ -125,14 +128,14 @@ describe('nodeit', function () {
 
             // Then
             var compiledContent = "" +
-                "function desired_function_to_wrap() {" +
-                "   return  'first wrap';" +
-                "}" +
-                "function another_desired_function_to_wrap() {" +
-                "   return 'second wrap';" +
-                "}\n" +
+                "var fs = require('fs');\n" +
+                "var vm = require('vm');\n" +
+                "var data = fs.readFileSync('vanilla.js');\n" +
+                "context = {}\n" +
+                "vm.runInNewContext(data, context, 'vanilla.js')\n" +
                 "exports.desired_function_to_wrap = desired_function_to_wrap;\n" +
                 "exports.another_desired_function_to_wrap = another_desired_function_to_wrap;";
+
             createCompiledFile.withArgs(sinon.match(TARGET + '/vanilla.js', compiledContent)).calledOnce.should.equal(true);
             fs.readFileSync.restore();
         });
@@ -189,6 +192,10 @@ describe('nodeit', function () {
             doesDirExist.restore();
             createCompiledFile.restore();
         });
+    });
+
+    afterEach(function () {
+        fs.realpathSync.restore();
     });
 });
 function nodeitDirname() {
