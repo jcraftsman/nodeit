@@ -21,7 +21,6 @@ describe('nodeit', function () {
             // Given
             sinon.stub(fs, 'readFileSync').returns('function desired_function_to_wrap(){}');
 
-
             // When
             var wrappedModule = nodeit.modularize('fileName');
 
@@ -76,7 +75,7 @@ describe('nodeit', function () {
 
     describe('compile', function () {
 
-        var doesDirExist, createDirectory, createCompiledFile, readSourceFile, realpathSyncFile;
+        var doesDirExist, createDirectory, createCompiledFile, readSourceFile;
         beforeEach(function () {
             doesDirExist = sinon.stub(fs, 'existsSync');
             createDirectory = sinon.spy(fs, 'mkdirSync');
@@ -132,11 +131,11 @@ describe('nodeit', function () {
                 "var vm = require('vm');\n" +
                 "var data = fs.readFileSync('vanilla.js');\n" +
                 "context = {}\n" +
-                "vm.runInNewContext(data, context, 'vanilla.js')\n" +
-                "exports.desired_function_to_wrap = desired_function_to_wrap;\n" +
-                "exports.another_desired_function_to_wrap = another_desired_function_to_wrap;";
+                'vm.runInNewContext(data, context, \'vanilla.js\')\n\n' +
+                'exports.desired_function_to_wrap = context.desired_function_to_wrap;\n' +
+                'exports.another_desired_function_to_wrap = context.another_desired_function_to_wrap;';
 
-            createCompiledFile.withArgs(sinon.match(TARGET + '/vanilla.js', compiledContent)).calledOnce.should.equal(true);
+            createCompiledFile.withArgs(TARGET + '/vanilla.js', compiledContent).calledOnce.should.equal(true);
             fs.readFileSync.restore();
         });
 

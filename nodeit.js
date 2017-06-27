@@ -25,15 +25,14 @@ function compile(fileName) {
     var source_path = getSourceUrl(fileName);
     var src = parse(source_path);
     var functionNames = src.functionNames;
-    var compiledFileContent = "var fs = require('fs');\n"
-    compiledFileContent += "var vm = require('vm');\n"
-    compiledFileContent += "var data = fs.readFileSync(\'" + source_path + "\');\n"
-    compiledFileContent += "context = {}\n"
-    compiledFileContent += "vm.runInNewContext(data, context, '" + source_path + "')\n";;
-
+    var compiledFileContent = 'var fs = require(\'fs\');\n';
+    compiledFileContent += 'var vm = require(\'vm\');\n';
+    compiledFileContent += 'var data = fs.readFileSync(\'' + source_path + '\');\n';
+    compiledFileContent += 'context = {}\n';
+    compiledFileContent += 'vm.runInNewContext(data, context, \'' + source_path + '\')\n';
     for (var index in functionNames) {
         var functionName = functionNames[index];
-        compiledFileContent += '\nexports.' + functionName + ' = ' + functionName + ';'
+        compiledFileContent += '\nexports.' + functionName + ' = context.' + functionName + ';'
     }
     if (!fs.existsSync(COMPIL_TARGET_DIR)) {
         fs.mkdirSync(COMPIL_TARGET_DIR);
