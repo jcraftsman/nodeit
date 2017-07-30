@@ -27,12 +27,11 @@ function compile(fileName) {
     var functionNames = src.functionNames;
     var compiledFileContent = 'var fs = require(\'fs\');\n';
     compiledFileContent += 'var vm = require(\'vm\');\n';
-    compiledFileContent += 'var data = fs.readFileSync(\'' + source_path + '\');\n';
-    compiledFileContent += 'context = {}\n';
-    compiledFileContent += 'vm.runInNewContext(data, context, \'' + source_path + '\')\n';
+    compiledFileContent += 'var code = fs.readFileSync(\'' + source_path + '\');\n';
+    compiledFileContent += 'vm.runInThisContext(code, \'' + source_path + '\')\n';
     for (var index in functionNames) {
         var functionName = functionNames[index];
-        compiledFileContent += '\nexports.' + functionName + ' = context.' + functionName + ';'
+        compiledFileContent += '\nexports.' + functionName + ' = ' + functionName + ';'
     }
     if (!fs.existsSync(COMPIL_TARGET_DIR)) {
         fs.mkdirSync(COMPIL_TARGET_DIR);
