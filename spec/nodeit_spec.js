@@ -129,11 +129,11 @@ describe('nodeit', function () {
             var compiledContent = "" +
                 "var fs = require('fs');\n" +
                 "var vm = require('vm');\n" +
-                "var data = fs.readFileSync('vanilla.js');\n" +
-                "context = {}\n" +
-                'vm.runInNewContext(data, context, \'vanilla.js\')\n\n' +
-                'exports.desired_function_to_wrap = context.desired_function_to_wrap;\n' +
-                'exports.another_desired_function_to_wrap = context.another_desired_function_to_wrap;';
+                'dep_name = require(\'util\',undefined);\n\n' +
+                'var code = fs.readFileSync(\'vanilla.js\');\n' +
+                'vm.runInThisContext(code, \'vanilla.js\')\n\n' +
+                'exports.desired_function_to_wrap = desired_function_to_wrap;\n' +
+                'exports.another_desired_function_to_wrap = another_desired_function_to_wrap;';
 
             createCompiledFile.withArgs(TARGET + '/vanilla.js', compiledContent).calledOnce.should.equal(true);
             fs.readFileSync.restore();

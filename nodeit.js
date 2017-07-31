@@ -27,6 +27,7 @@ function compile(fileName) {
     var functionNames = src.functionNames;
     var compiledFileContent = 'var fs = require(\'fs\');\n';
     compiledFileContent += 'var vm = require(\'vm\');\n';
+    compiledFileContent += declareDependencies() + '\n';
     compiledFileContent += 'var code = fs.readFileSync(\'' + source_path + '\');\n';
     compiledFileContent += 'vm.runInThisContext(code, \'' + source_path + '\')\n';
     for (var index in functionNames) {
@@ -59,7 +60,7 @@ function declareDependencies() {
     var declareDependencies = '';
     for (var depIndex in dependencies) {
         var oneDependency = dependencies[depIndex];
-        declareDependencies += 'var ' + oneDependency.name +
+        declareDependencies += oneDependency.name +
             " = require('" + oneDependency.dependency + "'," + oneDependency.callback + ');\n';
     }
     return declareDependencies;
