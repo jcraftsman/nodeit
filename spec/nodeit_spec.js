@@ -29,13 +29,13 @@ describe('nodeit', function () {
         });
         it('should export all the functions from a vanilla js file ', function () {
             // Given
-            var fileContent = "" +
-                "function desired_function_to_wrap() {" +
-                "   return  'first wrap';" +
-                "}" +
-                "function another_desired_function_to_wrap() {" +
-                "   return 'second wrap';" +
-                "}";
+            var fileContent = '' +
+                'function desired_function_to_wrap() {' +
+                '   return  \'first wrap\';' +
+                '}' +
+                'function another_desired_function_to_wrap() {' +
+                '   return \'second wrap\';' +
+                '}';
             sinon.stub(fs, 'readFileSync').returns(fileContent);
 
             // When
@@ -58,10 +58,10 @@ describe('nodeit', function () {
         it('should add the dependency', function () {
             // Given
             sinon.stub(fs, 'readFileSync').returns('' +
-                "function wrapped_function(){" +
-                "   dep_name.inspect(0);" +
-                "   return 'calling dependencies succeeded!';" +
-                "}");
+                'function wrapped_function(){' +
+                '   dep_name.inspect(0);' +
+                '   return \'calling dependencies succeeded!\';' +
+                '}');
 
             // When
             var wrappedModule = nodeit.include('dep_name', 'util').modularize('fileName');
@@ -86,57 +86,6 @@ describe('nodeit', function () {
 
         it('should be defined', function () {
             nodeit.compile.should.be.defined;
-        });
-        it('should create target directory when it does not exist', function () {
-            // Given
-            doesDirExist.withArgs(TARGET).returns(false);
-
-            // When
-            nodeit.compile('vanilla');
-
-            // Then
-            sinon.assert.calledWith(createDirectory, TARGET);
-
-        });
-        it('should not create target directory when it exists', function () {
-            // Given
-            doesDirExist.withArgs(TARGET).returns(true);
-
-            // When
-            nodeit.compile('vanilla');
-
-            // Then
-            createDirectory.callCount.should.equal(0);
-
-        });
-
-        it('should create the compiled file within target directory', function () {
-            // Given
-            var sourceFileContent = "" +
-                "function desired_function_to_wrap() {" +
-                "   return  'first wrap';" +
-                "}" +
-                "function another_desired_function_to_wrap() {" +
-                "   return 'second wrap';" +
-                "}";
-            readSourceFile.returns(sourceFileContent);
-
-
-            // When
-            nodeit.compile('vanilla');
-
-            // Then
-            var compiledContent = "" +
-                "var fs = require('fs');\n" +
-                "var vm = require('vm');\n" +
-                'dep_name = require(\'util\',undefined);\n\n' +
-                'var code = fs.readFileSync(\'vanilla.js\');\n' +
-                'vm.runInThisContext(code, \'vanilla.js\')\n\n' +
-                'exports.desired_function_to_wrap = desired_function_to_wrap;\n' +
-                'exports.another_desired_function_to_wrap = another_desired_function_to_wrap;';
-
-            createCompiledFile.withArgs(TARGET + '/vanilla.js', compiledContent).calledOnce.should.equal(true);
-            fs.readFileSync.restore();
         });
 
         describe('dependsOnStatic', function () {
@@ -197,6 +146,7 @@ describe('nodeit', function () {
         fs.realpathSync.restore();
     });
 });
-function nodeitDirname() {
+
+function nodeitDirname () {
     return __dirname.substring(0, __dirname.lastIndexOf('/'));
 }

@@ -1,14 +1,16 @@
-const COMPIL_TARGET_DIR = __dirname + '/target';
+const path = require('path');
+
+const COMPIL_TARGET_DIR = path.join(__dirname, 'target');
 var fs = require('fs');
 
 var dependencies = [];
 
-function include(name, dependency, callback) {
+function include (name, dependency, callback) {
     dependencies.push({'name': name, 'dependency': dependency, 'callback': callback});
     return this;
 }
 
-function modularize(fileName) {
+function modularize (fileName) {
 
     var src = parse(fileName);
 
@@ -21,7 +23,7 @@ function modularize(fileName) {
     return this;
 }
 
-function compile(fileName) {
+function compile (fileName) {
     var source_path = getSourceUrl(fileName);
     var src = parse(source_path);
     var functionNames = src.functionNames;
@@ -37,12 +39,12 @@ function compile(fileName) {
     if (!fs.existsSync(COMPIL_TARGET_DIR)) {
         fs.mkdirSync(COMPIL_TARGET_DIR);
     }
-    var compiledFilePath = COMPIL_TARGET_DIR + '/' + removeDirFromPath(src);
+    var compiledFilePath = path.join(COMPIL_TARGET_DIR, removeDirFromPath(src));
     fs.writeFileSync(compiledFilePath, compiledFileContent);
     return require(compiledFilePath);
 }
 
-function dependsOnStatic(className, staticMethodName) {
+function dependsOnStatic (className, staticMethodName) {
     if (!global[className]) {
         global[className] = {};
     }
@@ -56,17 +58,17 @@ function dependsOnStatic(className, staticMethodName) {
     return this;
 }
 
-function declareDependencies() {
+function declareDependencies () {
     var declareDependencies = '';
     for (var depIndex in dependencies) {
         var oneDependency = dependencies[depIndex];
         declareDependencies += oneDependency.name +
-            " = require('" + oneDependency.dependency + "'," + oneDependency.callback + ');\n';
+            ' = require(\'' + oneDependency.dependency + '\',' + oneDependency.callback + ');\n';
     }
     return declareDependencies;
 }
 
-function extractFunctionNames(fileContent) {
+function extractFunctionNames (fileContent) {
     var rawFunctionNames = fileContent.match(/function (.*?)\(/g);
     var functionNames = [];
     for (var functionIndex in rawFunctionNames) {
@@ -78,24 +80,24 @@ function extractFunctionNames(fileContent) {
     return functionNames;
 }
 
-function parse(fileName) {
+function parse (fileName) {
     var sourceFile = fs.readFileSync(fileName);
     var fileContent = declareDependencies() + sourceFile.toString();
     var functionNames = extractFunctionNames(fileContent);
     return {fileName: fileName, fileContent: fileContent, functionNames: functionNames};
 }
 
-function getSourceUrl(fileName) {
-    var rootDir = __dirname + '/../../';
+function getSourceUrl (fileName) {
+    var rootDir = path.join(__dirname, '..', '..');
     fileName += fileName.endsWith('.js') ? '' : '.js';
-    return fs.realpathSync(rootDir + fileName)
+    return fs.realpathSync(path.join(rootDir, fileName))
 }
 
-function removeDirFromPath(src) {
-    return src.fileName.substring(src.fileName.lastIndexOf('/') + 1);
+function removeDirFromPath (src) {
+    return src.fileName.substring(src.fileName.lastIndexOf(path.sep) + 1);
 }
 
-function appendClassWithMethod(classObject, staticMethodName) {
+function appendClassWithMethod (classObject, staticMethodName) {
     classObject[staticMethodName] = function () {
         throw staticMethodName + ' is not implemented. It is declared for static dependency stubbing only!'
     };
