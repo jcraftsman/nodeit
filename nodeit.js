@@ -90,8 +90,14 @@ function parse (fileName) {
 function getSourceUrl (fileName) {
     var rootDir = path.join(__dirname, '..', '..');
     fileName += fileName.endsWith('.js') ? '' : '.js';
-    return fs.realpathSync(path.join(rootDir, fileName))
+    var realPath = fs.realpathSync(path.join(rootDir, fileName));
+    realPath = escapeBackSlash(realPath);
+    return realPath
 }
+
+var escapeBackSlash = function (realPath) {
+    return realPath.replace(/\\/g, '\\\\');
+};
 
 function removeDirFromPath (src) {
     return src.fileName.substring(src.fileName.lastIndexOf(path.sep) + 1);
