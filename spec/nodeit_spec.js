@@ -134,6 +134,26 @@ describe('nodeit', function () {
 
         });
 
+        describe('dependsOn', function () {
+            it('should define given methods on the class given by its name', function () {
+                // Given
+                var wrappedModule = nodeit.modularize('fileName');
+                var classToInject = {
+                    method: function () {
+
+                    }
+                };
+
+                //When
+                wrappedModule.dependsOn(classToInject, 'className');
+
+                //Then
+                className.method.should.be.defined;
+
+            });
+
+        });
+
         afterEach(function () {
             readSourceFile.restore();
             createDirectory.restore();
