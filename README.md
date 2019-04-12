@@ -36,6 +36,31 @@ const calculator = require('nodeit')
 describe('Calculator', () => {
     it('should return 4 as sum(1,3)',()=>{
         expect(calculator.sum(2,2)).toEqual(4);
-    })
+    })``
 });
+```
+
+## Inject dependencies
+
+If the js you want to node has some dependencies, you can inject them with 3 methods:
+
+#### External dependencies
+  ```js
+  const calculator = require('nodeit')
+      .include("_", "lodash")
+      .compile('src/Calculator');
+```
+
+#### Static dependencies
+  ```js
+  const calculator = require('nodeit')
+      .dependsOnStatic("StaticClass", "staticMethodName")
+      .compile('src/Calculator');
+```
+
+#### Custom dependencies
+  ```js
+  const calculator = require('nodeit')
+      .dependsOn(dependency, "dependencyName")
+      .compile('src/Calculator');
 ```

@@ -58,6 +58,11 @@ function dependsOnStatic (className, staticMethodName) {
     return this;
 }
 
+function dependsOn (classToInject, className) {
+    global[className] = classToInject;
+    return this;
+}
+
 function declareDependencies () {
     var declareDependencies = '';
     for (var depIndex in dependencies) {
@@ -113,3 +118,4 @@ exports.modularize = modularize;
 exports.include = include;
 exports.compile = compile;
 exports.dependsOnStatic = dependsOnStatic;
+exports.dependsOn = dependsOn;
