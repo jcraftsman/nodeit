@@ -1,4 +1,5 @@
 # Nodeit
+![Node.js CI](https://github.com/jcraftsman/nodeit/workflows/Node.js%20CI/badge.svg?branch=master)
 
 ## Synopsis
 
